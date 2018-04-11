@@ -18,12 +18,19 @@ library(dplyr)
 # clear environment
 rm(list=ls())
 
+# take the time
+ptm_Skript_beginn <- proc.time()
+
+# set path and working directory
+mainDir <- "C:/Users/AVogl/Desktop/Kaggle"
+setwd(file.path(mainDir))
+
 # load train and test dataset
-train <- read.csv("C:/Users/Andi/Desktop/Kaggle House pricing/train.csv", header = T)
-test <- read.csv("C:/Users/Andi/Desktop/Kaggle House pricing/test.csv", header = T)
+train <- read.csv("train.csv", header = T)
+test <- read.csv("test.csv", header = T)
 
 # load testsubmission
-testsubmission <- read.csv("C:/Users/Andi/Desktop/Kaggle House pricing/sample_submission.csv", header = T)
+testsubmission <- read.csv("sample_submission.csv", header = T)
 
 # safe Ids
 Id <- test$Id
@@ -99,7 +106,10 @@ whole_dummy <-dummy.data.frame(whole, dummy.classes = "factor")
 train2 <- whole_dummy[1:1460,]
 test2 <- whole_dummy[1461:2919,]
 
+modelcompare <- numeric(5)
+
 ####################
+set.seed(1234)
 model1 <- train(
   SalePrice~., data=train2,
   method="lm",
@@ -109,52 +119,55 @@ model1 <- train(
   )
 )
 pred1 <- predict(model1, test2)
-rmse(log10(testsubmission$SalePrice), pred1)
+modelcompare[1] <- rmse(log10(testsubmission$SalePrice), pred1)
 SalePrice <- 10**pred1
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "C:/Users/Andi/Desktop/Kaggle House pricing/submission1.csv", row.names = F)
+write.csv(submission, "submission1.csv", row.names = F)
 
-
-model2 <- train(SalePrice~.,
-                data=train2,
-                method = "ranger",
-                trControl = trainControl(
-                  method = "cv", number = 5,
-                  verboseIter = TRUE
-                ))
-pred2 <- predict(model2, test2)
-rmse(log10(testsubmission$SalePrice), pred2)
-SalePrice <- 10**pred2
-submission <- data.frame(Id, SalePrice)
-write.csv(submission, "C:/Users/Andi/Desktop/Kaggle House pricing/submission2.csv", row.names = F)
-# kaggle score 0.13972
-
-model3 <- train(
-  SalePrice~.,
-  tuneLength = 5,
-  data = train2, method = "ranger",
-  trControl = trainControl(method = "cv", number = 5, verboseIter = TRUE)
-)
-pred3 <- predict(model3, test2)
-rmse(log10(testsubmission$SalePrice), pred3)
-SalePrice <- 10**pred3
-submission <- data.frame(Id, SalePrice)
-write.csv(submission, "C:/Users/Andi/Desktop/Kaggle House pricing/submission3.csv", row.names = F)
-# kaggle score 0.13804
-
-model4 <- train(
+set.seed(1234)
+model2 <- train(
   SalePrice~.,
   tuneLength = 5,
   data = train2, method = "lm",
   trControl = trainControl(method = "cv", number = 5, verboseIter = TRUE)
 )
-pred4 <- predict(model4, test2)
-rmse(log10(testsubmission$SalePrice), pred4)
-SalePrice <- 10**pred4
+pred2 <- predict(model2, test2)
+modelcompare[2] <- rmse(log10(testsubmission$SalePrice), pred2)
+SalePrice <- 10**pred2
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "C:/Users/Andi/Desktop/Kaggle House pricing/submission4.csv", row.names = F)
+write.csv(submission, "submission4.csv", row.names = F)
 # kaggle score 0.13982
 
+set.seed(1234)
+model3 <- train(SalePrice~.,
+                data=train2,
+                method = "ranger",
+                trControl = trainControl(
+                  method = "cv", number = 10,
+                  verboseIter = TRUE
+                ))
+pred3 <- predict(model3, test2)
+modelcompare[3] <- rmse(log10(testsubmission$SalePrice), pred3)
+SalePrice <- 10**pred3
+submission <- data.frame(Id, SalePrice)
+write.csv(submission, "submission2.csv", row.names = F)
+# kaggle score 0.13972
+
+set.seed(1234)
+model4 <- train(
+  SalePrice~.,
+  tuneLength = 5,
+  data = train2, method = "ranger",
+  trControl = trainControl(method = "cv", number = 5, verboseIter = TRUE)
+)
+pred4 <- predict(model4, test2)
+modelcompare[4] <- rmse(log10(testsubmission$SalePrice), pred4)
+SalePrice <- 10**pred4
+submission <- data.frame(Id, SalePrice)
+write.csv(submission, "submission3.csv", row.names = F)
+# kaggle score 0.13804
+
+set.seed(1234)
 model5 <- train(
   SalePrice~.,
   tuneLength = 5,
@@ -162,8 +175,13 @@ model5 <- train(
   trControl = trainControl(method = "cv", number = 5, verboseIter = TRUE)
 )
 pred5 <- predict(model5, test2)
-rmse(log10(testsubmission$SalePrice), pred5)
+modelcompare[5] <- rmse(log10(testsubmission$SalePrice), pred5)
 SalePrice <- 10**pred5
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "C:/Users/Andi/Desktop/Kaggle House pricing/submission5.csv", row.names = F)
+write.csv(submission, "submission5.csv", row.names = F)
 # kaggle score 0.13852
+
+# check the skript running time
+modelcompare
+ptm_Skript_end <- proc.time()-ptm_Skript_beginn
+ptm_Skript_end[[3]]
