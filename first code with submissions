@@ -22,7 +22,7 @@ rm(list=ls())
 ptm_Skript_beginn <- proc.time()
 
 # set path and working directory
-mainDir <- "C:/Users/AVogl/Desktop/Kaggle"
+mainDir <- "path/Kaggle"
 setwd(file.path(mainDir))
 
 # load train and test dataset
