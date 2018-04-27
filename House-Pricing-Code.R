@@ -135,7 +135,7 @@ pred2 <- predict(model2, test2)
 modelcompare[2] <- rmse(log10(testsubmission$SalePrice), pred2)
 SalePrice <- 10**pred2
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "submission4.csv", row.names = F)
+write.csv(submission, "submission2.csv", row.names = F)
 # kaggle score 0.13982
 
 set.seed(1234)
@@ -150,7 +150,7 @@ pred3 <- predict(model3, test2)
 modelcompare[3] <- rmse(log10(testsubmission$SalePrice), pred3)
 SalePrice <- 10**pred3
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "submission2.csv", row.names = F)
+write.csv(submission, "submission3.csv", row.names = F)
 # kaggle score 0.13972
 
 set.seed(1234)
@@ -164,7 +164,7 @@ pred4 <- predict(model4, test2)
 modelcompare[4] <- rmse(log10(testsubmission$SalePrice), pred4)
 SalePrice <- 10**pred4
 submission <- data.frame(Id, SalePrice)
-write.csv(submission, "submission3.csv", row.names = F)
+write.csv(submission, "submission4.csv", row.names = F)
 # kaggle score 0.13804
 
 set.seed(1234)
