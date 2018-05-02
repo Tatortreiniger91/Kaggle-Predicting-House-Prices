@@ -19,7 +19,7 @@ library(dplyr)
 rm(list=ls())
 
 # take the time
-ptm_Skript_beginn <- proc.time()
+ptm_script_beginn <- proc.time()
 
 # set path and working directory
 mainDir <- "path/Kaggle"
@@ -71,7 +71,7 @@ cleaning_fac <- function(x){
   return(x)
 }
 
-# exercise the function to the dataset and check again
+# run the functions to the dataset and check again
 whole <- cleaning_num(whole)
 whole <- cleaning_fac(whole)
 summary(whole)
@@ -106,6 +106,7 @@ whole_dummy <-dummy.data.frame(whole, dummy.classes = "factor")
 train2 <- whole_dummy[1:1460,]
 test2 <- whole_dummy[1461:2919,]
 
+#create vector to compare rmse from different models
 modelcompare <- numeric(5)
 
 ####################
@@ -181,7 +182,8 @@ submission <- data.frame(Id, SalePrice)
 write.csv(submission, "submission5.csv", row.names = F)
 # kaggle score 0.13852
 
-# check the skript running time
+#compare rmse from different models
 modelcompare
-ptm_Skript_end <- proc.time()-ptm_Skript_beginn
-ptm_Skript_end[[3]]
+# check the skript running time
+ptm_script_end <- proc.time()-ptm_script_beginn
+ptm_script_end[[3]]
