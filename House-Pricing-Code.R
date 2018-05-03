@@ -107,7 +107,7 @@ train2 <- whole_dummy[1:1460,]
 test2 <- whole_dummy[1461:2919,]
 
 #create vector to compare rmse from different models
-modelcompare <- numeric(5)
+modelcompare <- numeric(7)
 
 ####################
 set.seed(1234)
@@ -181,6 +181,101 @@ SalePrice <- 10**pred5
 submission <- data.frame(Id, SalePrice)
 write.csv(submission, "submission5.csv", row.names = F)
 # kaggle score 0.13852
+
+
+
+# set traincontrol
+cv.ctrl <- trainControl(method = "repeatedcv",
+                        repeats = 3,
+                        number = 3,
+                        verboseIter = TRUE)
+
+
+# run model without any tuning
+model6 <- train(SalePrice ~.,
+                  data=train2,
+                  method="xgbTree",
+                  metric = "RMSE",
+                  trControl=cv.ctrl
+                  )
+
+
+pred6 <- predict(model6, test2)
+modelcompare[6] <- rmse(log10(testsubmission$SalePrice), pred6)
+SalePrice <- 10**pred6
+submission <- data.frame(Id, SalePrice)
+write.csv(submission, "submission6.csv", row.names = F)
+# kaggle score 0.13575
+
+
+# library(xgboost)
+
+# identify good tuning parameters
+# BEWARE: this process take a couple of hours
+
+# train<- as.matrix(train2, rownames.force=NA)
+# test<- as.matrix(test2, rownames.force=NA)
+#train <- as(train, "sparseMatrix")
+#test <- as(test, "sparseMatrix")
+
+
+
+# All_rmse<- c()
+# Param_group<-c()
+# grid <- expand.grid(objective = "reg:linear",
+#                     eval_metric = "rmse",
+#                     booster = "gbtree",
+#                     max_depth = seq(6, 10),
+#                     eta = seq(0.01, 0.3, length=10),
+#                     gamma = seq(0.0, 0.2, length=10),
+#                     subsample = seq(0.6, 0.9, by=0.1),
+#                     colsample_bytree = seq(0.5, 0.8, by=0.1))
+
+
+# for(i in 1:8000){
+#   param <- grid[i,]
+# 
+#   cv.nround = 100
+#   cv.nfold = 2
+#   mdcv <- xgb.cv(data=train[,-237], params = param, nthread=6, label = train[,"SalePrice"],
+#                  nfold=cv.nfold, nrounds=cv.nround,verbose = TRUE)
+#   # Least Mean_Test_RMSE as Indicator # 
+#   min_rmse<- min(mdcv$evaluation_log$test_rmse_mean)
+#   All_rmse<-append(All_rmse,min_rmse)
+#   Param_group<-append(Param_group,param)
+#   # Select Param
+#   param<-Param_group[(which.min(All_rmse)*8+1):(which.min(All_rmse)*8+8)]
+#   print(i)
+# }
+
+
+# identified tuning parameters with more nrounds
+xgb.tune <- expand.grid(nrounds=600,
+                        max_depth = 8,
+                        eta = 0.1388889,
+                        gamma = 0,
+                        subsample = 0.8,
+                        min_child_weight = 1,
+                        colsample_bytree = 0.7)
+
+
+model7 <- train(SalePrice ~.,
+                  data=train2,
+                  method="xgbTree",
+                  metric = "RMSE",
+                  trControl=cv.ctrl,
+                  tuneGrid=xgb.tune
+)
+
+pred7 <- predict(model7, test2)
+modelcompare[7] <- rmse(log10(testsubmission$SalePrice), pred7)
+SalePrice <- 10**pred7
+submission <- data.frame(Id, SalePrice)
+write.csv(submission, "submission7.csv", row.names = F)
+#kaggle score 0.12955
+
+
+
 
 #compare rmse from different models
 modelcompare
