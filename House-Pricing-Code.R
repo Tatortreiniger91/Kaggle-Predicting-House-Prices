@@ -1,12 +1,3 @@
-install.packages("tidyr")
-install.packages("hydroGOF")
-install.packages("dummies")
-install.packages("car")
-install.packages("caret")
-install.packages("randomForest")
-install.packages("dplyr")
-install.packages("lattice")
-install.packages("ggplot2")
 library(tidyr)
 library(hydroGOF)
 library(dummies)
@@ -14,6 +5,7 @@ library(car)
 library(caret)
 library(randomForest)
 library(dplyr)
+library(xgboost)
 
 # clear environment
 rm(list=ls())
@@ -208,7 +200,6 @@ write.csv(submission, "submission6.csv", row.names = F)
 # kaggle score 0.13575
 
 
-# library(xgboost)
 
 # identify good tuning parameters
 # BEWARE: this process take a couple of hours
